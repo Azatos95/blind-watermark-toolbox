@@ -1,0 +1,31 @@
+# 构建产物 / 虚拟环境 / 缓存 —— 均不入库
+dist/
+build/
+.venv/
+.venv-build/
+*.egg-info/
+
+# Python 缓存
+__pycache__/
+*.py[cod]
+*.pyo
+
+# 程序运行产生的输出(自检临时目录、盲水印输出)
+盲水印自检_*/
+盲水印输出/
+flow_out/
+*.bwm.json
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# 大型二进制(如需分发请走 GitHub Releases, 不要提交)
+*.exe
+*.dll
+*.so
+*.dylib
