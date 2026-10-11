@@ -172,8 +172,17 @@ python -m venv --system-site-packages .venv-build
 
 本项目以 **MIT License** 开源，见 [LICENSE](LICENSE)。
 
+`LICENSE` 保留的是**原项目**的版权声明 —— MIT 协议要求二次开发必须保留它：
+
+```
+MIT License
+Copyright (c) 2019 郭飞 (guofei9987)
+```
+
+也就是说：
+
 - 算法与原始代码：**Copyright (c) 2019 郭飞 (guofei9987)** — [blind_watermark](https://github.com/guofei9987/blind_watermark)
-- 本 GUI / 打包工程：Copyright (c) 2026 Azatos95
+- 本仓库新增的 GUI / 打包工程：Copyright (c) 2026 Azatos95，同样以 MIT 协议发布
 
 第三方依赖及其协议见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 

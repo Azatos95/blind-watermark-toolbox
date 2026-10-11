@@ -1,11 +1,6 @@
 MIT License
 
-Copyright (c) 2019 郭飞 (guofei9987)  --  blind_watermark 算法与原始代码
-Copyright (c) 2026 Azatos95          --  本仓库的 GUI 与打包工程(二次开发)
-
-本仓库是 https://github.com/guofei9987/blind_watermark 的二次开发:
-盲水印算法及其原始实现版权归原作者 郭飞 (guofei9987) 所有,
-本仓库仅新增图形界面与打包工程, 同样以 MIT 协议发布。
+Copyright (c) 2019 郭飞 (guofei9987)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
