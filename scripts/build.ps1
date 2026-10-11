@@ -29,10 +29,21 @@ Write-Host "==> PyInstaller 打包..." -ForegroundColor Cyan
 
 $exe = Join-Path $root 'dist\盲水印工具箱.exe'
 if (-not (Test-Path $exe)) { throw "打包失败, 未生成 $exe" }
-$mb = [math]::Round((Get-Item $exe).Length / 1MB, 1)
-Write-Host "==> 产物: $exe  ($mb MB)" -ForegroundColor Green
+$item = Get-Item $exe
+$mb = [math]::Round($item.Length / 1MB, 1)
+$ver = $item.VersionInfo
+Write-Host "==> 产物: $exe" -ForegroundColor Green
+Write-Host "    大小: $mb MB | 版本: $($ver.FileVersion)" -ForegroundColor Green
+Write-Host "    版权: $($ver.LegalCopyright)" -ForegroundColor Green
+Write-Host "    SHA256: $((Get-FileHash $exe -Algorithm SHA256).Hash)" -ForegroundColor Green
 
 # 4) 自检(验证打包产物在目标机上真的能跑)
 Write-Host "==> 运行内置自检 --selftest ..." -ForegroundColor Cyan
 & $exe --selftest
 Write-Host "==> 完成。自检报告见 exe 同目录的 selftest_report.txt" -ForegroundColor Green
+
+# 5) 发布提示
+Write-Host ""
+Write-Host "如需发布到 GitHub Releases (网页版):" -ForegroundColor Yellow
+Write-Host "  https://github.com/Azatos95/blind-watermark-toolbox/releases/new"
+Write-Host "  或已安装 gh:  gh release create v0.2 dist\盲水印工具箱.exe --title `"盲水印工具箱 v0.2`""

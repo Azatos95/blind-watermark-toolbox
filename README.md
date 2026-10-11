@@ -89,7 +89,11 @@ python -m venv --system-site-packages .venv-build
 - `console=False`：GUI 程序不弹黑框。
 - `collect_data_files('tkinterdnd2')`：**tkdnd 是 Tcl 运行时从磁盘加载的原生扩展，必须原样随包分发**，否则打包后拖拽会静默失效。
 - `upx=False`：UPX 外壳是杀软误报重灾区，刻意关闭。
+- `version='version_info.txt'`：把版本号与**原作者署名**写进 exe 的文件属性（右键 → 属性 → 详细信息 可看到
+  `算法 blind_watermark: Copyright (c) 2019 郭飞 (guofei9987), MIT License`）。
 - `excludes` 排除 matplotlib/scipy/pandas/PyQt 等，控制体积。
+
+产物：`dist\盲水印工具箱.exe`（单文件，约 61 MB）。
 
 ---
 

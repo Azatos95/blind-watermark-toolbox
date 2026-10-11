@@ -73,4 +73,5 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     icon=None,               # 有图标时填 'app.ico'
+    version='version_info.txt',   # Windows 文件属性里的版本/产品信息
 )
