@@ -24,6 +24,20 @@
 | Tcl/Tk (tkinter 运行时) | 随 Python 3.14 | BSD 风格 | https://www.tcl.tk |
 | Python | 3.14.2 | PSF-2.0 | https://www.python.org |
 
+### 字体（v0.3 起使用，**未随包分发**）
+
+界面字体**不打包进 exe**，改为运行时探测本机已安装字体，因此不涉及字体再分发问题：
+
+| 字体 | 协议 | 来源 |
+|---|---|---|
+| 思源黑体 / Noto Sans SC | SIL Open Font License 1.1 | https://github.com/notofonts/noto-cjk |
+| 微软雅黑 / Segoe UI（回退项） | 随 Windows 授权 | 本机系统字体 |
+
+> 若目标机未安装思源黑体，程序自动回退到微软雅黑 / Segoe UI 并照常运行
+> （自检报告 `--selftest` 会打印实际选中的字体族）。
+> 如需**任何机器都显示思源黑体**，可自行下载 Noto Sans SC 并随包分发 —— 此时请遵守 OFL 1.1（允许商用与嵌入，
+> 但需保留字体版权声明，且不得单独售卖字体本身）。
+
 ## 打包工具
 
 | 组件 | 版本 | 协议 |
