@@ -1,4 +1,4 @@
-# 盲水印工具箱 v0.3
+﻿# 盲水印工具箱 v0.3
 
 给 [guofei9987/blind_watermark](https://github.com/guofei9987/blind_watermark) 做的中文图形界面，已打包为**单文件免安装 exe**。
 
@@ -80,8 +80,8 @@
 ## 文件校验
 
 - 文件名：`盲水印工具箱.exe`
-- 大小：64,077,417 字节（约 61.1 MB）
-- SHA256：`914DA75C3FBAE45274ACC2EF55E7C6F4607C9C2A44A8D11C7023A2ED5C1081FA`
+- 大小：64,077,163 字节（约 61.1 MB）
+- SHA256：`3657AAE3C1EC9856852D9F944712481E1763C38D16F0F7BDA49D9D53270CB1E4`
 - 内置版本信息：`0.3.0.0`，版权栏含原作者署名
 
 > 校验方法（PowerShell）：
