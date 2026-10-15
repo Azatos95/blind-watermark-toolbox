@@ -21,6 +21,13 @@ import sys
 import threading
 import traceback
 
+# --- 必须在 import tkinter 之前声明 DPI 感知 ---
+# 否则 Windows 会把窗口按系统缩放(如 150%)整体放大后再光栅化, 字体明显发虚。
+from bwm_theme import enable_dpi_awareness, compute_scale, sp, detect_font_weights
+
+DPI_AWARE = enable_dpi_awareness()
+UI_SCALE = compute_scale()
+
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
@@ -265,7 +272,7 @@ class Panel(tk.Frame):
         self._row = 0
         if title:
             tk.Label(self.inner, text=title, bg=PANEL, fg=FG_DIM,
-                     font=(FONT_MED, 10), anchor='w').grid(
+                     font=(FONT_MED, S_H2), anchor='w').grid(
                 row=self._row, column=0, sticky='w', padx=pad, pady=(pad - 4, 2))
             self._row += 1
             tk.Frame(self.inner, bg=LINE_SOFT, height=1).grid(
@@ -287,10 +294,10 @@ class DropZone(tk.Frame):
         self.rowconfigure(0, weight=1)
         self.rowconfigure(2, weight=1)
         self.hint = tk.Label(self, text=text, bg=PANEL_HI, fg=ACCENT,
-                             font=(FONT_MED, 10))
+                             font=(FONT_MED, S_H2))
         self.hint.grid(row=1, column=0)
         self.file_lbl = tk.Label(self, text='尚未选择文件', bg=PANEL_HI, fg=FG_MUTE,
-                                 font=(FONT_REG, 9), wraplength=520, justify='center')
+                                 font=(FONT_REG, S_BODY), wraplength=520, justify='center')
         self.file_lbl.grid(row=2, column=0, sticky='n', pady=(2, 0))
         for w in (self, self.hint, self.file_lbl):
             w.bind('<Button-1>', self._pick)
@@ -320,7 +327,7 @@ def entry(parent, var, width=None, bg=PANEL_HI):
                  disabledbackground=DISABLED_BG, disabledforeground=DISABLED_FG,
                  relief='flat', bd=0, highlightthickness=1,
                  highlightbackground=LINE, highlightcolor=ACCENT,
-                 font=(FONT_REG, 10), width=width or 14)
+                 font=(FONT_REG, S_H2), width=width or 14)
     return e
 
 
@@ -328,10 +335,10 @@ def _pwd_menu_button(parent, on_pick, tip='历史'):
     """▾ 历史密码按钮"""
     b = tk.Menubutton(parent, text='▾', bg=PANEL_HI, fg=FG_DIM, activebackground=ACCENT_SOFT,
                       activeforeground=ACCENT, relief='flat', bd=0, highlightthickness=1,
-                      highlightbackground=LINE, font=(FONT_MED, 10), width=2, cursor='hand2')
+                      highlightbackground=LINE, font=(FONT_MED, S_H2), width=2, cursor='hand2')
     m = tk.Menu(b, tearoff=0, bg=PANEL, fg=FG, activebackground=ACCENT_SOFT,
                 activeforeground=ACCENT, bd=1, relief='flat',
-                font=(FONT_REG, 9), activeborderwidth=0)
+                font=(FONT_REG, S_BODY), activeborderwidth=0)
     b.configure(menu=m)
     b._menu = m
     b._fill = lambda items, empty='(暂无历史)': _fill_menu(m, items, empty, on_pick)
@@ -363,7 +370,7 @@ class PwdRow:
             self.mb.pack(side='left', padx=(4, 0))
             self.refresh_history = self.mb._fill
         if hint:
-            label(box, hint, fg=FG_MUTE, font=(FONT_REG, 8)).pack(side='left', padx=(8, 0))
+            label(box, hint, fg=FG_MUTE, font=(FONT_REG, S_SMALL)).pack(side='left', padx=(8, 0))
 
 
 class PathRow:
@@ -388,7 +395,7 @@ def btn(parent, text, command, kind='ghost', width=None):
         b = tk.Button(parent, text=text, command=command, bg=ACCENT, fg='#141414',
                       activebackground=ACCENT_DK, activeforeground='#141414',
                       disabledforeground='#6a6250', relief='flat', bd=0,
-                      highlightthickness=0, font=(FONT_BOLD, 10), cursor='hand2',
+                      highlightthickness=0, font=(FONT_BOLD, S_H2), cursor='hand2',
                       padx=20, pady=8)
         if width:
             b.configure(width=width)
@@ -397,7 +404,7 @@ def btn(parent, text, command, kind='ghost', width=None):
                   activebackground=ACCENT_SOFT, activeforeground=ACCENT,
                   disabledforeground=DISABLED_FG, relief='flat', bd=0,
                   highlightthickness=1, highlightbackground=LINE, highlightcolor=ACCENT,
-                  font=(FONT_REG, 9), cursor='hand2', padx=12, pady=6)
+                  font=(FONT_REG, S_BODY), cursor='hand2', padx=12, pady=6)
     if width:
         b.configure(width=width)
     return b
@@ -411,7 +418,7 @@ class Toggle(tk.Button):
                          activebackground=ACCENT_SOFT, activeforeground=ACCENT,
                          relief='flat', bd=0, highlightthickness=1,
                          highlightbackground=LINE, highlightcolor=ACCENT,
-                         font=(FONT_MED, 9), cursor='hand2', padx=14, pady=6, **kw)
+                         font=(FONT_MED, S_BODY), cursor='hand2', padx=14, pady=6, **kw)
         self._cmd = command
         self._on = False
 
@@ -434,6 +441,13 @@ FONT_MED = 'TkDefaultFont'
 FONT_REG = 'TkDefaultFont'
 FONT_MONO = 'Consolas'
 
+# UI 字号(在 App._init_fonts 里按真实 DPI 缩放后覆盖)
+S_H1 = 16
+S_H2 = 11
+S_BODY = 9
+S_SMALL = 8
+S_MONO = 9
+
 
 # ---------------- 主窗口 ----------------
 class App(DND_TK):
@@ -448,8 +462,8 @@ class App(DND_TK):
 
         self.title('%s v%s' % (APP_NAME, APP_VER))
         self.configure(bg=BG)
-        self.minsize(760, 620)
-        self._center(940, 760)
+        self.minsize(sp(720), sp(580))
+        self._center(sp(900), sp(760))
 
         self._setup_style()
         self.logq = queue.Queue()
@@ -484,12 +498,31 @@ class App(DND_TK):
     # ---- 字体 ----
     def _init_fonts(self):
         self.F = detected_fonts(self)
+        # 字重探测: 可变字体在 Tk 里的族名可能带 Medium/DemiLight 后缀
+        self.W = detect_font_weights(self, [self.F['bold'], self.F['medium'], self.F['regular']])
         import tkinter.font as tkfont
-        try:
-            for name in ('TkDefaultFont', 'TkTextFont', 'TkMenuFont'):
-                tkfont.nametofont(name).configure(family=self.F['regular'], size=9)
-        except Exception:
-            pass
+        s = UI_SCALE
+        # 按真实 DPI 放大字号: 既提升清晰度, 也保证高缩放下观感一致。
+        # s=1.0 -> 正文 9pt / 主标题 14pt / 卡片标题 10pt
+        # s=1.5 -> 正文 12pt / 主标题 19pt / 卡片标题 13pt
+        base = max(9, int(round(9 * (1 + (s - 1) * 0.75))))   # 正文
+        for name, size in (('TkDefaultFont', base), ('TkTextFont', base),
+                           ('TkMenuFont', base), ('TkHeadingFont', base),
+                           ('TkTooltipFont', base - 1),
+                           ('TkSmallCaptionFont', base - 1),
+                           ('TkIconFont', base), ('TkCaptionFont', base + 1)):
+            try:
+                tkfont.nametofont(name).configure(family=self.F['regular'], size=size)
+            except Exception:
+                pass
+        global S_H1, S_H2, S_BODY, S_SMALL, S_MONO
+        S_H1 = base + 7          # 应用标题
+        S_H2 = base + 1          # 卡片标题 / 按钮
+        S_BODY = base            # 正文
+        S_SMALL = max(7, base - 1)   # 说明
+        S_MONO = max(7, base - 1)    # 日志(等宽)
+        self.S = {'h1': S_H1, 'h2': S_H2, 'body': S_BODY,
+                  'small': S_SMALL, 'mono': S_MONO}
 
     def f(self, weight='regular', size=9):
         fam = self.F.get(weight, self.F['regular'])
@@ -498,22 +531,25 @@ class App(DND_TK):
     # ---- 窗口 ----
     def _center(self, w, h):
         sw, sh = self.winfo_screenwidth(), self.winfo_screenheight()
+        # 屏幕不够大时按比例收窄, 避免窗口超出可视区域
+        w = min(w, int(sw * 0.94))
+        h = min(h, int(sh * 0.92))
         x, y = max(0, (sw - w) // 2), max(0, (sh - h) // 3)
         self.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
     # ---- 警戒线装饰(顶部斜纹) ----
     def _build_stripe(self):
-        self.stripe = tk.Canvas(self, height=4, bg=BG, highlightthickness=0, bd=0)
+        self.stripe = tk.Canvas(self, height=sp(4), bg=BG, highlightthickness=0, bd=0)
         self.stripe.pack(fill='x', side='top')
         self.stripe.bind('<Configure>', lambda e: self._draw_stripe())
         # 警戒线下方再压一条强调色细线, 强化"状态条"的装饰感
-        self.stripe_rule = tk.Frame(self, bg=ACCENT, height=1)
+        self.stripe_rule = tk.Frame(self, bg=ACCENT, height=max(1, sp(1)))
         self.stripe_rule.pack(fill='x', side='top')
 
     def _draw_stripe(self):
         c = self.stripe
         c.delete('all')
-        w, h = c.winfo_width(), 4
+        w, h = c.winfo_width(), sp(4)
         if w < 4:
             w = self.winfo_width() or 800
         color = self._state_color or OK_GREEN
@@ -565,7 +601,7 @@ class App(DND_TK):
         # 进度条
         st.configure('Thin.Horizontal.TProgressbar', background=ACCENT,
                      troughcolor=PANEL, bordercolor=LINE, lightcolor=ACCENT,
-                     darkcolor=ACCENT, borderwidth=0, thickness=3)
+                     darkcolor=ACCENT, borderwidth=0, thickness=max(2, sp(3)))
 
         # 滚动条: 极细直角(clam 默认带立体箭头, 这里去掉)
         st.layout('Vertical.TScrollbar', [
@@ -575,7 +611,7 @@ class App(DND_TK):
         ])
         st.configure('Vertical.TScrollbar', background=LINE, troughcolor='#0D0F11',
                      bordercolor='#0D0F11', lightcolor=LINE, darkcolor=LINE,
-                     arrowcolor=LINE, borderwidth=0, relief='flat', width=6)
+                     arrowcolor=LINE, borderwidth=0, relief='flat', width=max(4, sp(6)))
         st.map('Vertical.TScrollbar', background=[('active', ACCENT)])
 
     # ---- 顶部 ----
@@ -619,7 +655,7 @@ class App(DND_TK):
         self.status = tk.Label(bar, text='就绪', bg=BG, fg=FG_MUTE,
                                font=(self.F['regular'], 9), anchor='w')
         self.status.pack(side='left', padx=(10, 0))
-        self.bar = ttk.Progressbar(bar, mode='indeterminate', length=120,
+        self.bar = ttk.Progressbar(bar, mode='indeterminate', length=sp(120),
                                    style='Thin.Horizontal.TProgressbar')
         self.log_btn = btn(bar, '收起日志', self._toggle_log, kind='ghost')
         self.log_btn.pack(side='right')
@@ -633,7 +669,7 @@ class App(DND_TK):
         wrap.pack(fill='both', expand=True)
         inner = tk.Frame(wrap, bg='#0D0F11')
         inner.pack(fill='both', expand=True, padx=1, pady=1)
-        self.log_text = tk.Text(inner, height=5, wrap='word', bg='#0D0F11', fg='#B9C0C6',
+        self.log_text = tk.Text(inner, height=sp(5), wrap='word', bg='#0D0F11', fg='#B9C0C6',
                                 insertbackground=ACCENT, bd=0, relief='flat',
                                 highlightthickness=0, padx=10, pady=8,
                                 font=(self.F['mono'], 9), state='disabled')
@@ -1186,20 +1222,20 @@ class ExtractTab(BaseTab):
         for w in self.hist_box.winfo_children():
             w.destroy()
         if pairs:
-            label(self.hist_box, '历史', fg=FG_MUTE, font=(FONT_REG, 8)).pack(side='left',
+            label(self.hist_box, '历史', fg=FG_MUTE, font=(FONT_REG, S_SMALL)).pack(side='left',
                                                                             padx=(0, 4))
         for pi, pw in pairs:
             cell = tk.Frame(self.hist_box, bg=ACCENT, bd=0)
             cell.pack(side='left', padx=(6, 0))
             b = tk.Label(cell, text='%s / %s' % (pi, pw), bg=PANEL_HI, fg=FG_DIM,
-                         font=(FONT_MONO, 8), padx=9, pady=3, cursor='hand2')
+                         font=(FONT_MONO, S_MONO), padx=9, pady=3, cursor='hand2')
             b.pack(padx=(2, 0))          # 左侧留出 2px 强调色竖条
             b.bind('<Button-1>', lambda e, a=pi, c=pw: self._use_pair(a, c))
             b.bind('<Enter>', lambda e, w=b: w.configure(fg=ACCENT, bg=PANEL))
             b.bind('<Leave>', lambda e, w=b: w.configure(fg=FG_DIM, bg=PANEL_HI))
         if not pairs:
             label(self.hist_box, '历史: 暂无(成功嵌入一次就会记住密码)', fg=FG_MUTE,
-                  font=(FONT_REG, 8)).pack(side='left')
+                  font=(FONT_REG, S_SMALL)).pack(side='left')
         self.mb_pi._fill(top_i, '暂无历史')
         self.mb_pw._fill(top_w, '暂无历史')
 
@@ -1350,6 +1386,7 @@ def self_test():
     import tempfile
     import cv2
     import numpy as np
+    from bwm_theme import system_dpi
 
     out = []
     out.append('frozen=%s' % getattr(sys, 'frozen', False))
@@ -1446,6 +1483,10 @@ def self_test():
             fonts = detected_fonts(r)
             out.append('fonts -> bold=%s medium=%s regular=%s mono=%s'
                        % (fonts['bold'], fonts['medium'], fonts['regular'], fonts['mono']))
+            out.append('ui_scale -> dpi=%d scale=%.2f dpi_aware=%s ui_scale=%.2f'
+                       % (system_dpi(), system_dpi() / 96.0, DPI_AWARE, UI_SCALE))
+            out.append('screen(physical-ish) -> %dx%d ; default_window -> %dx%d'
+                       % (r.winfo_screenwidth(), r.winfo_screenheight(), sp(940), sp(750)))
             if 'Noto Sans SC' not in (fonts['bold'] + fonts['medium']) and \
                     'Source Han Sans' not in (fonts['bold'] + fonts['medium']):
                 out.append('  (提示: 本机未装思源黑体, 已回退到 %s)' % fonts['bold'])
