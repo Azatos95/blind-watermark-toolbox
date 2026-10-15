@@ -214,7 +214,8 @@ def read_sidecar(img_path):
     if not os.path.isfile(p):
         return None
     try:
-        with open(p, encoding='utf-8') as f:
+        # utf-8-sig: 兼容带 BOM 的 json(手工编辑/第三方工具写入时会带)
+        with open(p, encoding='utf-8-sig') as f:
             return json.load(f)
     except Exception:
         return None

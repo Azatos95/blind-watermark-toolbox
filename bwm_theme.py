@@ -39,15 +39,18 @@ class History:
 
     # ---- 读写 ----
     def load(self):
+        """读历史。用 utf-8-sig: 用户手动编辑/系统工具写入时可能带 BOM,
+        带 BOM 的 JSON 用 utf-8 解码会抛异常, 会导致整份历史被静默丢弃。"""
         try:
-            with open(self.FILE, encoding='utf-8') as f:
+            with open(self.FILE, encoding='utf-8-sig') as f:
                 d = json.load(f)
             if isinstance(d, dict):
                 for k in self.data:
                     if k in d and isinstance(d[k], type(self.data[k])):
                         self.data[k] = d[k]
+            return True
         except Exception:
-            pass
+            return False
 
     def save(self):
         try:

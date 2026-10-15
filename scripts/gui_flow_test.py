@@ -1,8 +1,17 @@
 # -*- coding: utf-8 -*-
-"""v0.3 端到端: 模拟用户操作 + 历史密码记忆/自动填入 + 主题/警戒线 验证(真实 mainloop)"""
+"""v0.3 端到端: 模拟用户操作 + 历史密码记忆/自动填入 + 主题/警戒线 验证(真实 mainloop)
+
+用法: 在仓库根目录执行  python scripts\\gui_flow_test.py
+需要源图: 默认用 C:\\Users\\A\\Desktop\\图片盲水印\\盲水印嵌入\\pic\\ori_img.jpg,
+        也可用环境变量 BWM_TEST_IMG 指定任意图片。
+"""
 import os
+import sys
 import time
 from tkinter import messagebox
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, REPO)
 
 import bwm_gui as G
 from bwm_theme import History
@@ -10,9 +19,15 @@ from bwm_theme import History
 messagebox.showerror = lambda *a, **k: print('  [错误对话框]', a[1:2], flush=True)
 messagebox.showinfo = lambda *a, **k: print('  [提示对话框]', a[1:2], flush=True)
 
-SRC = r'C:\Users\A\Desktop\图片盲水印\盲水印嵌入\pic\ori_img.jpg'
-TESTDIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'flow_out')
+SRC = os.environ.get(
+    'BWM_TEST_IMG',
+    r'C:\Users\A\Desktop\图片盲水印\盲水印嵌入\pic\ori_img.jpg')
+TESTDIR = os.path.join(REPO, 'flow_out')
 os.makedirs(TESTDIR, exist_ok=True)
+
+if not os.path.isfile(SRC):
+    print('缺少测试原图: %s\n可用环境变量 BWM_TEST_IMG 指定图片路径。' % SRC)
+    sys.exit(2)
 
 # 用独立的历史文件, 不污染真实配置
 HIST = os.path.join(TESTDIR, 'history_test.json')
